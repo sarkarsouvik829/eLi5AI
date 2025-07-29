@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 # Initialize Groq LLM
 llm = ChatGroq(
-    groq_api_key='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',
+    groq_api_key=os.getenv('GROQ_API_KEY'),
     model="llama3-8b-8192"
 )
 
