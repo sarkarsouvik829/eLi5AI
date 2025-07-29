@@ -187,7 +187,7 @@
   </div>
 
   <button class="btn btn-outline-secondary toggle-btn" onclick="toggleDarkMode()">🌗</button>
-  
+
   <div id="question-counter" style="
     position: fixed;
     top: 12px;
@@ -205,13 +205,13 @@
     align-items: center;
     gap: 6px;
   ">
-  🌍 <span>Community Questions:</span> <span id="question-count">0</span>
+  🌍 <span>Community Questions:</span> <span id="question-count">{{ question_count }}</span>
 </div>
 
   <div class="container py-5">
     <h1 class="mb-4 text-center">📚 Explain Like I'm 5</h1>
 
-    <form method="POST" class="mb-4" onsubmit="incrementQuestionCount(); showLoader()">
+    <form method="POST" class="mb-4">
       <div class="input-group shadow">
         <input name="question" type="text" class="form-control" placeholder="Ask anything..." required value="{{ user_question }}">
         <button type="submit" class="btn btn-primary px-4">Explain</button>
@@ -236,7 +236,7 @@
         <h4 class="mb-3">🧠 Want to learn more?</h4>
         <div class="d-flex flex-column gap-2">
           {% for q in followups %}
-            <form method="POST" onsubmit="incrementQuestionCount(); showLoader()">
+            <form method="POST">
               <input type="hidden" name="question" value="{{ q }}">
               <button type="submit" class="btn btn-outline-primary followup-button">{{ q }}</button>
             </form>
@@ -263,17 +263,6 @@
         if (card !== el) card.classList.remove('active');
       });
       el.classList.toggle('active');
-    }
-
-    function incrementQuestionCount() {
-      let count = parseInt(localStorage.getItem('questionCount') || '0', 10);
-      count += 1;
-      localStorage.setItem('questionCount', count);
-      updateQuestionCounterDisplay(count);
-    }
-
-    function updateQuestionCounterDisplay(count) {
-      document.getElementById('question-count').textContent = count;
     }
 
     window.onload = function () {

@@ -1,9 +1,23 @@
 from flask import Flask, render_template, request, send_from_directory
 from langchain_groq import ChatGroq
-import os, re
+import json, os, re
 
 app = Flask(__name__)
 
+COUNT_FILE = "question_count.json"
+
+def load_question_count():
+    if os.path.exists(COUNT_FILE):
+        with open(COUNT_FILE, "r") as file:
+            return json.load(file).get("count", 0)
+    return 0
+
+def increment_question_count():
+    count = load_question_count() + 1
+    with open(COUNT_FILE, "w") as file:
+        json.dump({"count": count}, file)
+    return count
+    
 # Initialize Groq LLM
 llm = ChatGroq(
     groq_api_key=os.getenv('GROQ_API_KEY'),
@@ -65,6 +79,7 @@ def index():
     cue_cards = []
     followups = []
     user_question = ""
+    question_count = load_question_count()
 
     if request.method == "POST":
         user_question = request.form.get("question", "").strip()
@@ -83,11 +98,18 @@ def index():
                 cue_cards = parse_cue_cards(response)
                 followups = parse_followups(response)
 
+                # Increment count
+                question_count = increment_question_count()
+
             except Exception as e:
                 cue_cards = [{"title": "Oops!", "content": f"Something went wrong: {e}"}]
 
-    return render_template("index.html", cue_cards=cue_cards, followups=followups, user_question=user_question)
-
+    return render_template("index.html",
+        cue_cards=cue_cards,
+        followups=followups,
+        user_question=user_question,
+        question_count=question_count
+    )
 
 def parse_cue_cards(response_text):
     pattern = r"\*\*Cue Card \d+: (.*?)\*\*\n(.*?)(?=\n\*\*Cue Card \d+:|\nFollow-up Questions:|\Z)"
