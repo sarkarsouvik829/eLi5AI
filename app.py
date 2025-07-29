@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
 from langchain_groq import ChatGroq
+import os, re
 
 app = Flask(__name__)
 
@@ -8,8 +9,6 @@ llm = ChatGroq(
     groq_api_key=os.getenv('GROQ_API_KEY'),
     model="llama3-8b-8192"
 )
-
-from flask import send_from_directory
 
 @app.route('/manifest.json')
 def manifest():
@@ -91,14 +90,12 @@ def index():
 
 
 def parse_cue_cards(response_text):
-    import re
     pattern = r"\*\*Cue Card \d+: (.*?)\*\*\n(.*?)(?=\n\*\*Cue Card \d+:|\nFollow-up Questions:|\Z)"
     matches = re.findall(pattern, response_text, re.DOTALL)
     return [{"title": title.strip(), "content": content.strip()} for title, content in matches]
 
 
 def parse_followups(response_text):
-    import re
     followup_section = re.search(r"(?i)\*?\*?Follow[- ]?up Questions:?[\*\*]?\s*\n+(.*)", response_text, re.DOTALL)
     if followup_section:
         block = followup_section.group(1)
