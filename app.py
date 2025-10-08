@@ -21,7 +21,7 @@ def increment_question_count():
 # Initialize Groq LLM
 llm = ChatGroq(
     groq_api_key=os.getenv('GROQ_API_KEY'),
-    model="llama3-8b-8192"
+    model="llama-3.1-8b-instant"
 )
 
 @app.route('/manifest.json')
@@ -128,3 +128,4 @@ def parse_followups(response_text):
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port='4000', debug=True)
+
